@@ -1,0 +1,10 @@
+version: "3"
+services:
+  database:
+    image: mariadb
+    restart: always
+    environment:
+        MARIADB_ROOT_PASSWORD: securePassword123!@#
+        MARIADB_DATABASE: bookAPI
+    ports:
+        - "9090:3306"
