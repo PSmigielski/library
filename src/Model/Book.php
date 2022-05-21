@@ -11,7 +11,7 @@ use ValueError;
 class Book extends Dbh
 {
     private string $title;
-    private DateTime $publication_date;
+    private DateTime $publicationDate;
     private string $publisher;
     private string|NULL $language;
     private int $pages;
@@ -21,48 +21,44 @@ class Book extends Dbh
     public function __construct(array $data = null)
     {
         if (!is_null($data)) {
-            try{
-                $this->validate($data);
-            } catch (Exception $e){
-                throw new Exception($e->getMessage());
-            }
             $this->title = $data["title"];
-            $this->publication_date = $data["publication_date"];
+            $this->publicationDate = $data["publication_date"];
             $this->publisher = $data["publisher"];
             $this->language = $data["language"];
             $this->pages = $data["pages"];
             $this->isbn = $data["isbn"];
             $this->genre = $data["genre"];
-            $this->authorId = $data["authorId"];
+            $this->authorId = $data["author_id"];
         }
     }
-    protected function create(): string
+    
+    public function create(): string
     {
-        $sql = "INSERT INTO book(bo_title,bo_publication_date,bo_publisher,bo_language,bo_pages,bo_isbn,bo_author_id,bo_genre) VALUES (?,?,?,?,?,?,?,?)";
+        $sql = "INSERT INTO book(title,publication_date,publisher,language,pages,isbn,author_id,genre) VALUES (?,?,?,?,?,?,?,?)";
         $stmt = $this->connect()->prepare($sql);
-        $res = $stmt->execute([$this->title, $this->publication_date->format("Y-m-d"), $this->publisher, $this->language, $this->pages, $this->isbn, $this->authorId, $this->genre]);
+        $res = $stmt->execute([$this->title, $this->publicationDate->format("Y-m-d"), $this->publisher, $this->language, $this->pages, $this->isbn, $this->authorId, $this->genre]);
         if ($res === TRUE) {
             return "the book has been added";
         } else {
             return "the book hasn't been added";
         }
     }
-    protected function edit(string $bookId): string
+    public function edit(string $bookId): string
     {
         $book = $this->getBook($bookId);
 
-        $sql = "UPDATE `book` SET `bo_title`=? , `bo_publication_date`=?, `bo_publisher`=?, `bo_language`=?, `bo_pages`=?, `bo_isbn`=?, `bo_author_id`=?, `bo_genre`=? WHERE `bo_id`=?";
+        $sql = "UPDATE `book` SET `title`=? , `publication_date`=?, `publisher`=?, `language`=?, `pages`=?, `isbn`=?, `author_id`=?, `genre`=? WHERE `id`=?";
         $stmt = $this->connect()->prepare($sql);
-        $res = $stmt->execute([$this->title, $this->publication_date->format("Y-m-d"), $this->publisher, $this->language, $this->pages, $this->isbn, $this->authorId, $this->genre,$bookId]);
+        $res = $stmt->execute([$this->title, $this->publicationDate->format("Y-m-d"), $this->publisher, $this->language, $this->pages, $this->isbn, $this->authorId, $this->genre,$bookId]);
         if ($res === TRUE) {
             return "the book has been added";
         } else {
             return "the book hasn't been added";
         }
     }
-    private static function validate(array $data): bool
+    public static function validate(array $data): bool
     {
-        $requiredKeys = ["title", "publication_date", "publisher", "pages", "isbn", "authorId", "genre"];
+        $requiredKeys = ["title", "publication_date", "publisher", "pages", "isbn", "author_id", "genre"];
         $optionalKeys = ["language"];
         foreach ($data as $key => $value) {
             if(array_search($key, $requiredKeys) === false && array_search($key, $optionalKeys) === false){
@@ -94,7 +90,7 @@ class Book extends Dbh
                         throw new Exception("invalid isbn");
                     }
                     break;
-                case "authorId":
+                case "author_id":
                     if (strlen($value) !== 36) {
                         throw new Exception("invalid authorId format");
                     }
@@ -130,11 +126,11 @@ class Book extends Dbh
     }
     private function count(): int
     {
-        $sql = "SELECT COUNT(`bo_id`) as `count` FROM `book`";
+        $sql = "SELECT COUNT(`id`) as `count` FROM `book`";
         $res = $this->connect()->query($sql);
         return $res->fetch()["count"];
     }
-    protected function getBooks(int $page = 1, int $limit = 30)
+    public function getBooks(int $page = 1, int $limit = 30)
     {
         $count = $this->count();
         $totalPages = ceil($count / $limit);
@@ -142,7 +138,7 @@ class Book extends Dbh
             throw new Exception("page overflow");
         }
         $offset = ($page - 1) * $limit;
-        $sql = "SELECT * FROM `book` INNER JOIN `author` ON `book`.`bo_author_id`=`author`.`au_id` LIMIT $limit OFFSET $offset";
+        $sql = "SELECT * FROM `book` INNER JOIN `author` ON `book`.`author_id`=`author`.`au_id` LIMIT $limit OFFSET $offset";
         $res = $this->connect()->query($sql);
         return [
             "books" => $res->fetchAll(),
@@ -151,9 +147,9 @@ class Book extends Dbh
             "count" => $count
         ];
     }
-    protected function getBook(string $bookId)
+    public function getBook(string $bookId)
     {
-        $sql = "SELECT * FROM `book` INNER JOIN `author` ON `book`.`bo_author_id`=`author`.`au_id` WHERE `bo_id` = ?";
+        $sql = "SELECT * FROM `book` WHERE `id` = ?";
         $stmt = $this->connect()->prepare($sql);
         $stmt->execute([$bookId]);
         $book = $stmt->fetch();
@@ -162,11 +158,43 @@ class Book extends Dbh
         }
         return $book;
     }
-    protected function remove(string $bookId)
+    public function remove(string $bookId)
     {
-        $sql = "DELETE FROM `book` WHERE `bo_id` = ?";
+        $sql = "DELETE FROM `book` WHERE `id` = ?";
         $stmt = $this->connect()->prepare($sql);
         $res = $stmt->execute([$bookId]);
         return $res;
+    }
+    public function getAuthorId()
+    {
+        return $this->authorId;
+    }
+    public function getGenre()
+    {
+        return $this->genre;
+    }
+    public function getIsbn()
+    {
+        return $this->isbn;
+    }
+    public function getPages()
+    {
+        return $this->pages;
+    }
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+    public function getPublisher()
+    {
+        return $this->publisher;
+    }
+    public function getPublicationDate()
+    {
+        return $this->publicationDate;
+    }
+    public function getTitle()
+    {
+        return $this->title;
     }
 }
