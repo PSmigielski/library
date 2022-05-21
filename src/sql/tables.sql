@@ -6,6 +6,7 @@ CREATE TABLE `book`(
 	`bo_language` VARCHAR(20),
 	`bo_pages` INT NOT NULL,
 	`bo_ibsn` VARCHAR(13) NOT NULL,
+	`bo_genre` ENUM("Classic", "Comic Book", "Fantasy", "Detective", "Historical Fiction", "Horror", "Romance", "Science Fiction", "Thriller", "Biography", "Essay", "History", "Poetry") NOT NULL
 );
 CREATE TABLE `author`(
 	`au_id` UUID PRIMARY KEY DEFAULT UUID(),
