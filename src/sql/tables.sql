@@ -1,19 +1,19 @@
 CREATE TABLE `book`(
-	`bo_id` UUID PRIMARY KEY DEFAULT UUID(),
-	`bo_title` VARCHAR(150) NOT NULL,
-	`bo_publication_date` DATE NOT NULL,
-	`bo_publisher` VARCHAR(70) NOT NULL,
-	`bo_language` VARCHAR(20),
-	`bo_pages` INT NOT NULL,
-	`bo_ibsn` VARCHAR(13) NOT NULL,
-	`bo_genre` ENUM("Classic", "Comic Book", "Fantasy", "Detective", "Historical Fiction", "Horror", "Romance", "Science Fiction", "Thriller", "Biography", "Essay", "History", "Poetry") NOT NULL
+	`id` UUID PRIMARY KEY DEFAULT UUID(),
+	`title` VARCHAR(150) NOT NULL,
+	`publication_date` DATE NOT NULL,
+	`publisher` VARCHAR(70) NOT NULL,
+	`language` VARCHAR(20),
+	`pages` INT NOT NULL,
+	`ibsn` VARCHAR(13) NOT NULL,
+	`genre` ENUM("Classic", "Comic Book", "Fantasy", "Detective", "Historical Fiction", "Horror", "Romance", "Science Fiction", "Thriller", "Biography", "Essay", "History", "Poetry") NOT NULL
 );
 CREATE TABLE `author`(
-	`au_id` UUID PRIMARY KEY DEFAULT UUID(),
-	`au_name` VARCHAR(60) NOT NULL,
-	`au_surname` VARCHAR(60) NOT NULL,
-	`au_birthday` DATE,
-	`au_bio` TEXT
+	`id` UUID PRIMARY KEY DEFAULT UUID(),
+	`name` VARCHAR(60) NOT NULL,
+	`surname` VARCHAR(60) NOT NULL,
+	`birthday` DATE,
+	`bio` TEXT
 );
-ALTER TABLE `book` ADD COLUMN `bo_author_id` UUID NOT NULL;
-ALTER TABLE `book` ADD FOREIGN KEY (`bo_author_id`) REFERENCES `author`(`au_id`);
+ALTER TABLE `book` ADD COLUMN `author_id` UUID NOT NULL;
+ALTER TABLE `book` ADD FOREIGN KEY (`author_id`) REFERENCES `author`(`id`);
